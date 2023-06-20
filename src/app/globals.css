@@ -25,3 +25,9 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+.main {
+min-height: 100vh;
+display: grid;
+place-content: center;
+}

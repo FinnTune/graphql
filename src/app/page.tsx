@@ -4,6 +4,7 @@ import Image from 'next/image'
 import React from 'react';
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
+import Auth from '@/lib/login';
 
 // Commented out code is for reference only. Feel free to delete it.
 
@@ -16,7 +17,7 @@ export default function Home() {
             <>
               <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-1">
                 <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                  <form id="login-form" className="space-y-6" action="#" method="POST">
+                  <form id="login-form" className="space-y-6" action="#" method="POST" onSubmit={Auth}>
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">Email address</label>
                       <div className="mt-2">
