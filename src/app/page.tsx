@@ -5,11 +5,48 @@ import React from 'react';
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import Auth from '@/lib/login';
+// import { useEffect } from 'react';
 
 // Commented out code is for reference only. Feel free to delete it.
 
 export default function Home() {
-  return (
+
+  // useEffect(() => {
+  //   document.addEventListener("DOMContentLoaded", () => {
+  //     const loginForm = document.getElementById("login-form") as HTMLFormElement;
+  //     if(loginForm) {
+  //         loginForm.addEventListener("submit", async (event) => {
+  //             event.preventDefault();
+  //             const email = (document.getElementById("email") as HTMLInputElement).value;
+  //             const password = (document.getElementById("password") as HTMLInputElement).value;
+              
+  //             // Base64 encode the credentials
+  //             const credentials = btoa(`${email}:${password}`);
+    
+  //             try {
+  //               const response = await fetch("https://01.gritlab.ax/api/auth/signin", {
+  //                 method: "POST",
+  //                 headers: {
+  //                   Authorization: `Basic ${credentials}`,
+  //                 },
+  //               });
+  //               if (response.status === 200) {
+  //                         const data = await response.json();
+  //                         const jwt = data;
+  //                         console.log("Acquired JWT: " + jwt);
+  //                         localStorage.setItem("jwt", jwt);
+  //                         window.location.href = "/profile.html";
+  //                       }
+  //             } catch (error) {
+  //               console.error("Element with id 'loginSubmit' not found");
+  //             }
+  //         });
+  //     }
+  //   });
+  // }, []);
+
+
+  const content = (
     <>
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
         <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
@@ -17,7 +54,7 @@ export default function Home() {
             <>
               <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-1">
                 <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                  <form id="login-form" className="space-y-6" action="#" method="POST" onSubmit={Auth}>
+                  <form id="login-form" className="space-y-6" method="POST" onSubmit={Auth}>
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">Email address</label>
                       <div className="mt-2">
@@ -75,38 +112,6 @@ export default function Home() {
             />
       </div>
     </>
-  )
+  );
+  return (content)
 }
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  const loginSubmit = document.getElementById("login-Submit") as HTMLFormElement;
-  if(loginSubmit) {
-      loginSubmit.addEventListener("submit", async (event) => {
-          event.preventDefault();
-          const email = (document.getElementById("email") as HTMLInputElement).value;
-          const password = (document.getElementById("password") as HTMLInputElement).value;
-          
-          // Base64 encode the credentials
-          const credentials = btoa(`${email}:${password}`);
-
-          try {
-            const response = await fetch("https://01.gritlab.ax/api/auth/signin", {
-              method: "POST",
-              headers: {
-                Authorization: `Basic ${credentials}`,
-              },
-            });
-            if (response.status === 200) {
-                      const data = await response.json();
-                      const jwt = data;
-                      console.log("Acquired JWT: " + jwt);
-                      localStorage.setItem("jwt", jwt);
-                      window.location.href = "/profile.html";
-                    }
-          } catch (error) {
-            console.error("Element with id 'loginSubmit' not found");
-          }
-      });
-  }
-});

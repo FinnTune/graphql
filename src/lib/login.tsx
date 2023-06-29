@@ -1,6 +1,8 @@
 import Toastify from "toastify-js";
+import axios from "axios";
 
-export default async function Auth() {
+export default async function Auth(event: any) {
+    event.preventDefault();
     console.log("Authenticating...");
 
     const emailElement = document.getElementById("email");
@@ -8,6 +10,9 @@ export default async function Auth() {
 
     let email: string;
     let password: string;
+
+    let link = `https://01.gritlab.ax/api/auth/signin`
+
 
     if (emailElement) {
     email = (emailElement as HTMLInputElement).value;
@@ -25,19 +30,18 @@ export default async function Auth() {
     const credentials = btoa(`${email}:${password}`); 
     
     try {
-    const response = await fetch("https://01.gritlab.ax/api/auth/signin", {
-        method: "POST",
-        headers: {
-        Authorization: `${credentials}`,
-        },
-    });
+        const response = await axios.post(
+            link,
+            {email: email, password: password,},
+            {headers: {Authorization: `Basic ${credentials}`,},}
+          );
 
     if (response.status === 200) {
-        const data = await response.json();
+        const data = await response.data;
         const jwt = data;
-        console.log("Acquired JWT: " + jwt);
+        console.log("Acquired JWT.");
         localStorage.setItem("jwt", jwt);
-        window.location.href = "/";
+        window.location.href = "/profile";
     } else {
         Toastify({
         text: "Invalid credentials. Please try again.",
