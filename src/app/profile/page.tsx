@@ -88,15 +88,10 @@ useEffect(() => {
 
       if (timelineContainer) {
           createTimeline(
-              timelineContainer.offsetWidth,
-              timelineContainer.offsetHeight,
+              1000,
+              110,
               data
           );
-
-          const firstHeight = timelineContainer.offsetHeight;
-          window.addEventListener("resize", () => {
-              createTimeline(timelineContainer.offsetWidth, firstHeight, data);
-          });
       } else {
           console.warn("Couldn't find element with ID 'timeline-container'.");
       }
@@ -175,7 +170,7 @@ useEffect(() => {
         </div>
       </section>
       <section className="statistics">
-        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://d3js.org/d3.v7.min.js" async />
         <div id="timeline-container">
           <svg id="timeline"></svg>
         </div>
