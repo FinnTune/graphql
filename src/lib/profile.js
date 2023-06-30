@@ -99,10 +99,11 @@
 //   }
   
   export function createTimeline(thicc, smoll, data) {
+    console.log("Creating timeline...");
     // remove the previous timeline
     d3.select("#timeline").selectAll("*").remove();
     d3.select(".tooltip").remove();
-  
+    
     // sort the timeline data by date
     data.data.user[0].timeline.sort(
       (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
@@ -289,6 +290,7 @@
   
   // Display the user XP and XP ratio in the DOM and generate the XP graph
   export function displayUserXp(xpAmount, upAmount, downAmount) {
+    console.log("Displaying user xp...");
     // Display the user XP
     document.getElementById(
       "total-xp"
@@ -315,18 +317,19 @@
   }
   
   export function displayUserInfo(user) {
+    console.log("Displaying user info...");
+    console.log(user);
+    console.log(user.attrs.phonenumber);
     // Set the title of the page to the username of the user
     document.title = `${user.login}s Profile`;
     // Set the user image
-    document.querySelector(".user-image").src = user.attrs.image;
+    document.getElementById("user-image").src = user.attrs.image;
     // set the user name
-    document.getElementById(
-      "name-profile"
-    ).textContent = ` ${user.login}s Profile`;
+    document.getElementById("name-profile").textContent = `${user.login}'s Profile`;
     // Set the user phone number
-    document.getElementById("phone").textContent = ` ${user.attrs.phonenumber}`;
+    document.getElementById("phone").textContent = `${user.attrs.phonenumber}`;
     //  set the user email
-    document.getElementById("email").textContent = ` ${user.attrs.email}`;
+    document.getElementById("email").textContent = `${user.attrs.email}`;
     // set the user first name and last name
     document.getElementById(
       "first-name-last-name"

@@ -17,7 +17,9 @@ export default function ProfileLayout({children,}: {children: React.ReactNode}) 
                     <a style={{ cursor: 'pointer' }} onClick={logout}>Logout</a><br/>
                 </div>
             </div>
+            <div>
             {children}
+            </div>
         </>
     )
 }

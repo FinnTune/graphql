@@ -7,6 +7,7 @@ export default async function Profile() {
 
 
 useEffect(() => {
+  async function fetchData() {
   const jwt = localStorage.getItem("jwt");
   if (!jwt) {
     window.location.href = "/";
@@ -71,12 +72,12 @@ useEffect(() => {
         body: JSON.stringify({ query }),
       }
     ).then(res => res.json()
-    
     ).then(
       data => {
         const user = data.data.user[0];
+
         displayUserInfo(user);
-      displayUserXp(
+        displayUserXp(
         user.xpAmount.aggregate.sum.amount,
         user.upAmount.aggregate.sum.amount,
         user.downAmount.aggregate.sum.amount
@@ -84,39 +85,41 @@ useEffect(() => {
   
       // get the size of the timeline-container
       const timelineContainer = document.getElementById("timeline-container");
-  
-      // create the timeline
-      createTimeline(
-        timelineContainer.offsetWidth,
-        timelineContainer.offsetHeight,
-        data
-      );
-      //  if the window is resized, re-create the timeline
-      const firstHeight = timelineContainer.offsetHeight;
-      window.addEventListener("resize", () => {
-        createTimeline(timelineContainer.offsetWidth, firstHeight, data);
-      });
+
+      if (timelineContainer) {
+          createTimeline(
+              timelineContainer.offsetWidth,
+              timelineContainer.offsetHeight,
+              data
+          );
+
+          const firstHeight = timelineContainer.offsetHeight;
+          window.addEventListener("resize", () => {
+              createTimeline(timelineContainer.offsetWidth, firstHeight, data);
+          });
+      } else {
+          console.warn("Couldn't find element with ID 'timeline-container'.");
+      }
       }
     ).catch(err => console.log(err))
 
     // const user = data.data.user[0];
-}, [])
+  }
+
+  fetchData();
+}, []);
 
 
 
   const content = (
     <>
-        <div className="about">
-        <div className="flex min-h-screen flex-col items-center p-10">
-        <h1>Profile</h1>
-        <p>Here is your profile.</p>
-        </div>
-        </div>
-        <section className="profile-info">
-        <h2 id="first-name-last-name">Name</h2>
-        <p id="email">Email</p>
-        <p id="from">From</p>
-        <p id="phone">Phone</p>
+      <div className="flex min-h-screen flex-col items-center p-10">
+      <h1 id="name-profile" className="my-4">Profile</h1>
+      <section className="profile-info">
+        <h2 id="first-name-last-name" className="my-4">Name</h2>
+        <p id="email" className="my-4">Email</p>
+        <p id="from" className="my-4">From</p>
+        <p id="phone" className="my-4">Phone</p>
       </section>
       <section className="profile-info">
         <div id="text-info">
@@ -128,7 +131,7 @@ useEffect(() => {
       </section>
       <section className="profile-info">
         <div className="user-image-container">
-          <img alt="User Image" className="user-image" />
+          <img alt="User Image" id="user-image" />
         </div>
       </section>
       <section className="statistics">
@@ -177,6 +180,7 @@ useEffect(() => {
           <svg id="timeline"></svg>
         </div>
       </section>
+      </div>
     </>
   )
     return(content)
