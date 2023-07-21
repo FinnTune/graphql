@@ -323,7 +323,10 @@
     // Set the title of the page to the username of the user
     document.title = `${user.login}s Profile`;
     // Set the user image
-    document.getElementById("user-image").src = user.attrs.image;
+    let imageElement = document.getElementById("user-image");
+    if (imageElement) {
+      imageElement.src = user.attrs.image;
+    }
     // set the user name
     document.getElementById("name-profile").textContent = `${user.login}'s Profile`;
     // Set the user phone number
