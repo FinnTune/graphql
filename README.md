@@ -1,190 +1,99 @@
-# graphql
+# Global Population Explorer
 
-### Created by André J. Teetor during the Gritlab.ax program
+An interactive data dashboard built with Next.js and TypeScript.
 
-## Running the project
+This project originally started as a GraphQL school profile assignment, but it was redesigned to work with public data after the original private source became unavailable. The app now uses live country data and focuses on practical exploration features.
 
-First, run the development server:
+## Features
+
+- Live fetch from the REST Countries API
+- Search by country or capital
+- Filter by region
+- Sort by population, density, or name
+- KPI cards that react to active filters
+- Top population ranking with SVG bars
+- Region snapshot summary
+- Spotlight card for the highest-density country
+- Side-by-side country comparison with visual index bars
+- Country explorer cards with language, timezone, and capital info
+
+## Tech Stack
+
+- Next.js 13 (App Router)
+- React 18
+- TypeScript
+- Tailwind CSS
+
+## Data Source
+
+- REST Countries API: [https://restcountries.com/](https://restcountries.com/)
+
+The dashboard currently requests:
+
+- `name`
+- `population`
+- `area`
+- `region`
+- `subregion`
+- `capital`
+- `flags`
+- `timezones`
+- `languages`
+- `independent`
+
+## Getting Started
+
+### 1) Install dependencies
+
+```bash
+npm install
+```
+
+### 2) Run in development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Objectives
+### 3) Run lint
 
-The objective of this project is to learn the GraphQL query language, by creating your own profile page.
+```bash
+npm run lint
+```
 
-You'll use the GraphQL endpoint which is provided by the platform (https://01.gritlab.ax/api/graphql-engine/v1/graphql). You'll be able to query your own data to populate your profile page.
+## Project Structure
 
-So that you can access your data, you'll need to create a login page.
+- `src/app/page.tsx` - Landing page
+- `src/app/profile/page.tsx` - Main interactive dashboard
+- `src/app/profile/layout.tsx` - Dashboard layout/header
+- `src/app/about/page.tsx` - Product-focused about page
+- `src/app/about/error.tsx` - Route-level error UI
+- `src/app/about/loading.tsx` - Route-level loading UI
 
-Your profile must display three pieces of information which you may choose. For example:
+## UX Goals
 
-    Basic user identification
-    XP amount
-    grades
-    audits
-    skills
+- Make global data exploration immediate and useful
+- Keep controls simple but expressive
+- Provide meaningful visual comparison at a glance
+- Stay accessible and responsive across screen sizes
 
-Beside those sections it will have a mandatory section for the generation of statistic graphs.
-Instructions
+## Roadmap Ideas
 
-You will have to create a profile UI where you can see your own school information. This information/data is present on the GraphQL endpoint, where you will have to query it.
+- Add continent map view with selectable markers
+- Add trend/history mode using another open dataset
+- Add bookmarking/favorites with local storage
+- Add export (CSV/JSON) for filtered result sets
+- Add test coverage for core data transformations
 
-The UI design is up to you. However, it must have a statistic section where you can generate graphs to see more about your journey and achievements on the school. This graphs must be done using SVG. You need to do at least two different statistic graphs for the data given. Bare in mind the principles of a good UI.
+## Notes
 
-Using SVG you can create several types of graphs including interactive graphs and animated graph. It will be up to you to decide what type of graphs you are going to do.
+- This repository still uses the original project name (`graphql`) for compatibility with existing setup and scripts.
+- The app no longer depends on private auth/JWT flows.
 
-Here are some possible combinations for the creation of the graphs:
+## Copyright and License
 
-    XP earned in a time period (progress over time)
-    XP earned by project
-    Audit ratio
-    Projects PASS and FAIL ratio
-    Piscine (JS/Go) stats
-        PASS and FAIL ratio
-        Attempts for each exercise
+Copyright (C) 2026 Andre J. Teetor
 
-Any other information you desire to display is welcome and will be noted.
-Login Page
-
-You'll need a JWT to access the GraphQL API. A JWT can be obtained from the signin endpoint (https://01.gritlab.ax/api/auth/signin).
-
-You may make a POST request to the signin endpoint, and supply your credentials using Basic authentication, with base64 encoding.
-
-Your login page must function with both:
-
-    username:password
-    email:password
-
-If the credentials are invalid, an appropriate error message must be displayed.
-
-You must provide a method to log out.
-
-When making GraphQL queries, you'll supply the JWT using Bearer authentication. It will only allow access to the data belonging to the authenticated user.
-
-    You may inspect the JWT to discover the ID of the authenticated user.
-
-Hosting
-
-Besides the creation of your own profile you will have to host it. There are several places where you can host your profile,
-for example: github-pages, netlify and so on. You are free to choose the hosting place.
-
-Here are a selection of interesting tables and columns which are exposed via GraphQL:
-
-    user table:
-
-    This table will have information about the user.
-    id 	login
-    1 	person1
-
-    transaction table:
-
-    This table will give you access to XP and through user table you can get to the audits ratio as well.
-    id 	type 	amount 	objectId 	userId 	createdAt 	path
-    1 	xp 	234 	42 	1 	2021-07-26T13:04:02.301092+00:00 	/madere/div-01/graphql
-    2 	xp 	1700 	2 	1 	2021-07-26T13:04:02.301092+00:00 	/madere/div-01/graphql
-    3 	xp 	175 	64 	1 	2021-07-26T13:04:02.301092+00:00 	/madere/div-01/graphql
-
-    progress table:
-    id 	userId 	objectId 	grade 	createdAt 	updatedAt 	path
-    1 	1 	3001 	1 	2021-07-26T13:04:02.301092+00:00 	2021-07-26T13:04:02.301092+00:00 	/madere/piscine-go/quest-01
-    2 	1 	198 	0 	2021-07-26T13:04:02.301092+00:00 	2021-07-26T13:04:02.301092+00:00 	/madere/piscine-go/quest-01
-    3 	1 	177 	1 	2021-07-26T13:04:02.301092+00:00 	2021-07-26T13:04:02.301092+00:00 	/madere/piscine-go/quest-01
-
-    result table:
-
-    Both progress and result table will give you the student progression.
-    id 	objectId 	userId 	grade 	type 	createdAt 	updatedAt 	path
-    1 	3 	1 	0 		2021-07-26T13:04:02.301092+00:00 	2021-07-26T13:04:02.301092+00:00 	/madere/div-01/graphql
-    2 	23 	1 	0 		2021-07-26T13:04:02.301092+00:00 	2021-07-26T13:04:02.301092+00:00 	/madere/div-01/graphql
-    3 	41 	1 	1 		2021-07-26T13:04:02.301092+00:00 	2021-07-26T13:04:02.301092+00:00 	/madere/div-01/graphql
-
-    object table:
-
-    This table will give you information about all objects (exercises/projects).
-    id 	name 	type 	attrs
-    1 	0 	exercise 	{}
-    2 	0 	project 	{}
-    3 	1 	exercise 	{}
-
-For more information about the tables and their columns you check out the database-structure and database-relations.
-
-Examples:
-
-Lets take for instance the table user and try to query it:
-
-{
-  user {
-    id
-  }
-}
-
-This simple query will return an array with the id of the authenticated user. If you wanted the login, you could just add the attribute to the query like so:
-
-{
-  user {
-    id
-    login
-  }
-}
-
-Here is another example of a query using the table user:
-
-{
-  object(where: { id: { _eq: 3323 }}) {
-    name
-    type
-  }
-}
-
-    Note: that for this query the introduction of variables (arguments) is required, so it will return just one object with the id equal to 3323.
-
-In GraphQL, the usage of arguments are specified in the schema. You can see the available query parameters by introspecting the API.
-
-    If you're logged in to the platform, you may access GraphiQL to more easily explore the schema.
-
-Example of nesting using the result and user table:
-
-{
-  result {
-    id
-    user {
-      id
-      login
-    }
-  }
-}
-
-For this example we ask for the results id and user that is associated to the result, requesting the user login and his id.
-
-You must use all the types of querying present above (normal, nested and using arguments), do not forget that you can use the types together or separately.
-
-This project will help you learn about:
-
-    GraphQL
-    GraphiQL
-    Hosting
-    JWT
-    Authentication
-    Authorization
-    Basics of human-computer interface
-        UI/UX
-
-
-
-## Technologies Used
-
-- This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-- This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-- This project uses [`next-auth`](https://next-auth.js.org/) to handle authentication.
-
--Testline for notifications
+This project is licensed under GNU GPL v2.0. See `LICENSE` for details.

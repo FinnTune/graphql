@@ -1,25 +1,23 @@
-'use client'
-import { useRouter } from "next/navigation"
+import Link from 'next/link'
 
-export default function ProfileLayout({children,}: {children: React.ReactNode}) {
-
-    const router = useRouter();
-
-    const logout = async () => {
-        localStorage.removeItem("jwt");
-        router.push('/');
-    }
-
-    return (
-        <>
-            <div>
-                <div className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-                    <a style={{ cursor: 'pointer' }} onClick={logout}>Logout</a><br/>
-                </div>
-            </div>
-            <div>
-            {children}
-            </div>
-        </>
-    )
+export default function ProfileLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <>
+      <div className="w-full border-b border-slate-300 bg-white/90 px-6 py-4 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">
+        <div className="mx-auto flex max-w-5xl items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+            World Explorer
+          </h2>
+          <Link href="/" className="text-sm font-medium text-indigo-600 hover:underline">
+            Back Home
+          </Link>
+        </div>
+      </div>
+      {children}
+    </>
+  )
 }
