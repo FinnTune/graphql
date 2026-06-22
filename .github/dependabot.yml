@@ -7,11 +7,17 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: eslint
+        versions: ['>=10.0.0']
     groups:
       nextjs:
         patterns:
           - next
           - eslint-config-next
+          - react
+          - react-dom
+          - eslint
       testing:
         patterns:
           - vitest

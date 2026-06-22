@@ -174,3 +174,15 @@ export function defaultCompareSelections(countries: Country[]): { compareA: stri
     compareB: countries[1]?.name.common ?? countries[0].name.common,
   }
 }
+
+export function resolveCompareSelection(
+  countries: Country[],
+  selected: string,
+  fallbackKey: 'compareA' | 'compareB'
+): string {
+  if (!countries.length) return ''
+  if (selected && findCountryByName(countries, selected)) {
+    return selected
+  }
+  return defaultCompareSelections(countries)[fallbackKey]
+}

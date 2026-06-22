@@ -7,7 +7,7 @@ import {
   buildRegionStats,
   countIndependent,
   countWithLanguageData,
-  defaultCompareSelections,
+  resolveCompareSelection,
   density,
   filterAndSortCountries,
   filterValidCountries,
@@ -33,8 +33,8 @@ export default function Profile() {
   const [query, setQuery] = useState('')
   const [selectedRegion, setSelectedRegion] = useState('All')
   const [sortBy, setSortBy] = useState<SortOption>('population')
-  const [compareA, setCompareA] = useState('')
-  const [compareB, setCompareB] = useState('')
+  const [compareASelection, setCompareASelection] = useState('')
+  const [compareBSelection, setCompareBSelection] = useState('')
 
   useEffect(() => {
     async function fetchCountries() {
@@ -66,15 +66,14 @@ export default function Profile() {
     [countries, query, selectedRegion, sortBy]
   )
 
-  useEffect(() => {
-    if (!filteredCountries.length) {
-      setCompareA('')
-      setCompareB('')
-      return
-    }
-    setCompareA((current) => current || defaultCompareSelections(filteredCountries).compareA)
-    setCompareB((current) => current || defaultCompareSelections(filteredCountries).compareB)
-  }, [filteredCountries])
+  const compareA = useMemo(
+    () => resolveCompareSelection(filteredCountries, compareASelection, 'compareA'),
+    [filteredCountries, compareASelection]
+  )
+  const compareB = useMemo(
+    () => resolveCompareSelection(filteredCountries, compareBSelection, 'compareB'),
+    [filteredCountries, compareBSelection]
+  )
 
   const topPopulationCountries = useMemo(
     () => getTopPopulationCountries(filteredCountries),
@@ -249,7 +248,7 @@ export default function Profile() {
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <select
             value={compareA}
-            onChange={(event) => setCompareA(event.target.value)}
+            onChange={(event) => setCompareASelection(event.target.value)}
             className="rounded-md border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950"
           >
             {filteredCountries.map((country) => (
@@ -260,7 +259,7 @@ export default function Profile() {
           </select>
           <select
             value={compareB}
-            onChange={(event) => setCompareB(event.target.value)}
+            onChange={(event) => setCompareBSelection(event.target.value)}
             className="rounded-md border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950"
           >
             {filteredCountries.map((country) => (
@@ -275,7 +274,7 @@ export default function Profile() {
             {[compareCountryA, compareCountryB].map((country, index) => {
               const accent = index === 0 ? 'bg-indigo-500' : 'bg-violet-500'
               return (
-                <article key={country.name.common} className="rounded-lg border border-slate-200 p-4 dark:border-slate-800">
+                <article key={`compare-${index}-${country.name.common}`} className="rounded-lg border border-slate-200 p-4 dark:border-slate-800">
                   <h3 className="text-lg font-semibold">{country.name.common}</h3>
                   <div className="mt-3 space-y-2 text-sm">
                     <p>Population: {formatNumber(country.population)}</p>

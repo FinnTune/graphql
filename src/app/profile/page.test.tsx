@@ -62,8 +62,10 @@ describe('Profile dashboard', () => {
     await screen.findByRole('heading', { name: /global population explorer/i })
     await user.type(screen.getByPlaceholderText(/search by country or capital/i), 'monaco')
 
-    expect(screen.getByRole('heading', { name: 'Monaco', level: 3 })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Japan', level: 3 })).not.toBeInTheDocument()
+    const explorer = screen.getByText('Country Explorer').closest('section')
+    expect(explorer).not.toBeNull()
+    expect(within(explorer as HTMLElement).getByRole('heading', { name: 'Monaco', level: 3 })).toBeInTheDocument()
+    expect(within(explorer as HTMLElement).queryByRole('heading', { name: 'Japan', level: 3 })).not.toBeInTheDocument()
   })
 
   it('filters countries by region', async () => {
@@ -73,8 +75,10 @@ describe('Profile dashboard', () => {
     await screen.findByRole('heading', { name: /global population explorer/i })
     await user.selectOptions(screen.getByDisplayValue('All'), 'Europe')
 
-    expect(screen.getByRole('heading', { name: 'Monaco', level: 3 })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Japan', level: 3 })).not.toBeInTheDocument()
+    const explorer = screen.getByText('Country Explorer').closest('section')
+    expect(explorer).not.toBeNull()
+    expect(within(explorer as HTMLElement).getByRole('heading', { name: 'Monaco', level: 3 })).toBeInTheDocument()
+    expect(within(explorer as HTMLElement).queryByRole('heading', { name: 'Japan', level: 3 })).not.toBeInTheDocument()
   })
 
   it('updates KPI cards for the active filter', async () => {

@@ -23,6 +23,7 @@ import {
   populationBarWidth,
   sortCountries,
   sumPopulation,
+  resolveCompareSelection,
 } from '@/lib/country-data'
 import {
   brazil,
@@ -33,6 +34,24 @@ import {
   sampleCountries,
   unitedStates,
 } from '@/test/fixtures/countries'
+
+describe('resolveCompareSelection', () => {
+  const valid = filterValidCountries(sampleCountries)
+
+  it('returns defaults when nothing is selected', () => {
+    expect(resolveCompareSelection(valid, '', 'compareA')).toBe('Japan')
+    expect(resolveCompareSelection(valid, '', 'compareB')).toBe('Monaco')
+  })
+
+  it('keeps a valid user selection', () => {
+    expect(resolveCompareSelection(valid, 'India', 'compareA')).toBe('India')
+  })
+
+  it('falls back when the selected country is no longer visible', () => {
+    const asiaOnly = valid.filter((country) => country.region === 'Asia')
+    expect(resolveCompareSelection(asiaOnly, 'Monaco', 'compareA')).toBe('Japan')
+  })
+})
 
 describe('formatNumber', () => {
   it('formats integers with grouping separators', () => {
