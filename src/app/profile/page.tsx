@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
+import { fetchCountriesViaGraphQL } from '@/lib/graphql-client'
 import {
-  REST_COUNTRIES_URL,
   buildRegionStats,
   countIndependent,
   countWithLanguageData,
@@ -39,13 +39,8 @@ export default function Profile() {
   useEffect(() => {
     async function fetchCountries() {
       try {
-        const response = await fetch(REST_COUNTRIES_URL)
-        if (!response.ok) {
-          throw new Error(`Request failed with status ${response.status}`)
-        }
-
-        const json = (await response.json()) as Country[]
-        setCountries(filterValidCountries(json))
+        const data = await fetchCountriesViaGraphQL()
+        setCountries(filterValidCountries(data))
       } catch (fetchError) {
         setError('Could not load country data right now. Please try again.')
         console.error(fetchError)

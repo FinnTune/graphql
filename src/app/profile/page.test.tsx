@@ -2,7 +2,7 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import Profile from '@/app/profile/page'
-import { REST_COUNTRIES_URL } from '@/lib/country-data'
+import { GRAPHQL_ENDPOINT } from '@/lib/graphql-client'
 import { sampleCountries } from '@/test/fixtures/countries'
 
 function mockCountriesResponse(countries = sampleCountries) {
@@ -10,7 +10,7 @@ function mockCountriesResponse(countries = sampleCountries) {
     'fetch',
     vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => countries,
+      json: async () => ({ data: { countries } }),
     })
   )
 }
@@ -36,7 +36,10 @@ describe('Profile dashboard', () => {
     render(<Profile />)
 
     expect(await screen.findByRole('heading', { name: /global population explorer/i })).toBeInTheDocument()
-    expect(fetch).toHaveBeenCalledWith(REST_COUNTRIES_URL)
+    expect(fetch).toHaveBeenCalledWith(
+      GRAPHQL_ENDPOINT,
+      expect.objectContaining({ method: 'POST' })
+    )
   })
 
   it('shows an error message when the API request fails', async () => {
