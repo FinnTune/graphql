@@ -37,10 +37,6 @@ export function normalized(value: number, max: number): number {
   return (value / max) * 100
 }
 
-export function populationBarWidth(population: number, maxPopulation: number): number {
-  return Math.max(8, (population / maxPopulation) * 100)
-}
-
 export function isValidCountry(country: Country): boolean {
   return Boolean(
     country?.name?.common &&

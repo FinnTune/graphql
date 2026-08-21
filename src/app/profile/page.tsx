@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { fetchCountriesViaGraphQL } from '@/lib/graphql-client'
 import WorldMap from '@/app/profile/WorldMap'
+import PopulationRankingChart from '@/app/profile/PopulationRankingChart'
+import ComparisonChart from '@/app/profile/ComparisonChart'
 import {
   buildRegionStats,
   countIndependent,
@@ -15,13 +17,10 @@ import {
   findCountryByName,
   formatLanguageList,
   formatNumber,
-  getComparisonMaxes,
   getDensestCountry,
   getRegionOptions,
   getSpotlightCountry,
   getTopPopulationCountries,
-  normalized,
-  populationBarWidth,
   sumPopulation,
   type Country,
   type SortOption,
@@ -77,7 +76,6 @@ export default function Profile() {
     [filteredCountries]
   )
 
-  const maxPopulation = topPopulationCountries[0]?.population ?? 1
   const independentCountries = useMemo(
     () => countIndependent(filteredCountries),
     [filteredCountries]
@@ -94,10 +92,6 @@ export default function Profile() {
   const compareCountryB = useMemo(
     () => findCountryByName(filteredCountries, compareB),
     [filteredCountries, compareB]
-  )
-  const comparisonMaxes = useMemo(
-    () => getComparisonMaxes(compareCountryA, compareCountryB),
-    [compareCountryA, compareCountryB]
   )
   const mapSelectedCountry = useMemo(
     () => (mapSelection ? findCountryByName(filteredCountries, mapSelection) : null),
@@ -206,22 +200,8 @@ export default function Profile() {
 
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <h2 className="text-xl font-semibold">Top 8 Countries by Population</h2>
-        <div className="mt-4 space-y-3">
-          {topPopulationCountries.map((country) => {
-            const width = populationBarWidth(country.population, maxPopulation)
-            return (
-              <div key={country.name.common}>
-                <div className="mb-1 flex items-center justify-between text-sm">
-                  <span>{country.name.common}</span>
-                  <span>{formatNumber(country.population)}</span>
-                </div>
-                <svg viewBox="0 0 100 8" preserveAspectRatio="none" className="h-3 w-full">
-                  <rect x="0" y="0" width="100" height="8" rx="2" fill="#dbeafe" />
-                  <rect x="0" y="0" width={width} height="8" rx="2" fill="#4f46e5" />
-                </svg>
-              </div>
-            )
-          })}
+        <div className="mt-4">
+          <PopulationRankingChart countries={topPopulationCountries} />
         </div>
       </section>
 
@@ -302,47 +282,20 @@ export default function Profile() {
           </select>
         </div>
         {compareCountryA && compareCountryB ? (
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
-            {[compareCountryA, compareCountryB].map((country, index) => {
-              const accent = index === 0 ? 'bg-indigo-500' : 'bg-violet-500'
-              return (
-                <article key={`compare-${index}-${country.name.common}`} className="rounded-lg border border-slate-200 p-4 dark:border-slate-800">
-                  <h3 className="text-lg font-semibold">{country.name.common}</h3>
-                  <div className="mt-3 space-y-2 text-sm">
-                    <p>Population: {formatNumber(country.population)}</p>
-                    <div>
-                      <div className="mb-1 flex justify-between text-xs">
-                        <span>Population index</span>
-                        <span>{normalized(country.population, comparisonMaxes.population).toFixed(1)}%</span>
-                      </div>
-                      <div className="h-2 rounded bg-slate-200 dark:bg-slate-700">
-                        <div className={`h-2 rounded ${accent}`} style={{ width: `${normalized(country.population, comparisonMaxes.population)}%` }} />
-                      </div>
-                    </div>
-                    <p>Area: {formatNumber(Math.round(country.area))} km2</p>
-                    <div>
-                      <div className="mb-1 flex justify-between text-xs">
-                        <span>Area index</span>
-                        <span>{normalized(country.area, comparisonMaxes.area).toFixed(1)}%</span>
-                      </div>
-                      <div className="h-2 rounded bg-slate-200 dark:bg-slate-700">
-                        <div className={`h-2 rounded ${accent}`} style={{ width: `${normalized(country.area, comparisonMaxes.area)}%` }} />
-                      </div>
-                    </div>
-                    <p>Density: {density(country).toFixed(1)} / km2</p>
-                    <div>
-                      <div className="mb-1 flex justify-between text-xs">
-                        <span>Density index</span>
-                        <span>{normalized(density(country), comparisonMaxes.density).toFixed(1)}%</span>
-                      </div>
-                      <div className="h-2 rounded bg-slate-200 dark:bg-slate-700">
-                        <div className={`h-2 rounded ${accent}`} style={{ width: `${normalized(density(country), comparisonMaxes.density)}%` }} />
-                      </div>
-                    </div>
-                  </div>
-                </article>
-              )
-            })}
+          <div className="mt-5 space-y-4">
+            <div className="grid gap-2 text-sm md:grid-cols-2">
+              <p>
+                <span className="font-semibold">{compareCountryA.name.common}:</span>{' '}
+                {formatNumber(compareCountryA.population)} people · {formatNumber(Math.round(compareCountryA.area))} km2 ·{' '}
+                {density(compareCountryA).toFixed(1)}/km2
+              </p>
+              <p>
+                <span className="font-semibold">{compareCountryB.name.common}:</span>{' '}
+                {formatNumber(compareCountryB.population)} people · {formatNumber(Math.round(compareCountryB.area))} km2 ·{' '}
+                {density(compareCountryB).toFixed(1)}/km2
+              </p>
+            </div>
+            <ComparisonChart countryA={compareCountryA} countryB={compareCountryB} />
           </div>
         ) : null}
       </section>

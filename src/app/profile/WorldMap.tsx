@@ -69,14 +69,18 @@ export default function WorldMap({ countries, selectedCountry, onSelectCountry }
         aria-label="World map colored by the selected metric"
         className="mt-4 h-auto w-full"
       >
-        {features.map((countryFeature) => {
+        {features.map((countryFeature, index) => {
           const match = valueIndex.get(countryFeature.ccn3)
           const isSelected = match?.country.name.common === selectedCountry
           const fill = match ? colorForValue(match.value, min, max) : MAP_UNMATCHED_FILL
 
           return (
             <path
-              key={countryFeature.ccn3 || countryFeature.name}
+              // A handful of territories share a missing or reused ISO
+              // numeric code (e.g. Kosovo/Somaliland both fall back to
+              // "000"), so ccn3/name aren't unique — index is, since
+              // `features` is a stable, memoized array.
+              key={index}
               d={countryFeature.path}
               fill={fill}
               stroke={isSelected ? '#4f46e5' : '#ffffff'}

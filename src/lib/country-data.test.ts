@@ -20,7 +20,6 @@ import {
   matchesCountryQuery,
   matchesRegion,
   normalized,
-  populationBarWidth,
   sortCountries,
   sumPopulation,
   resolveCompareSelection,
@@ -79,17 +78,6 @@ describe('normalized', () => {
 
   it('returns zero when max is zero', () => {
     expect(normalized(100, 0)).toBe(0)
-  })
-})
-
-describe('populationBarWidth', () => {
-  it('enforces a minimum bar width of 8', () => {
-    expect(populationBarWidth(1, 1_000_000)).toBe(8)
-  })
-
-  it('scales relative to the maximum population', () => {
-    expect(populationBarWidth(500, 1000)).toBe(50)
-    expect(populationBarWidth(1000, 1000)).toBe(100)
   })
 })
 

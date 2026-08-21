@@ -9,6 +9,15 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    // Without this, running multiple recharts-using test files in the same
+    // run can resolve to two separate module instances (one per file's
+    // isolated transform), so a chart's React Context provider and consumer
+    // come from different copies and the chart silently renders empty.
+    server: {
+      deps: {
+        inline: ['recharts'],
+      },
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],

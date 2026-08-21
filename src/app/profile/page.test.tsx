@@ -120,13 +120,18 @@ describe('Profile dashboard', () => {
     ).toHaveTextContent('Monaco')
   })
 
-  it('renders comparison cards for the default country pair', async () => {
+  it('renders a comparison summary and chart for the default country pair', async () => {
     render(<Profile />)
 
     await screen.findByRole('heading', { name: /compare two countries/i })
+    // The default pair comes from the population-sorted filtered list (the
+    // default sort), so it's the two most populous countries — India and
+    // the United States — not fixture insertion order.
     await waitFor(() => {
-      expect(screen.getAllByText(/population index/i).length).toBeGreaterThan(0)
+      expect(screen.getByText(/1,400,000,000 people/i)).toBeInTheDocument()
     })
+    expect(screen.getAllByText('India').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('United States').length).toBeGreaterThan(0)
   })
 
   it('renders the top population ranking section', async () => {
@@ -135,7 +140,24 @@ describe('Profile dashboard', () => {
     const ranking = await screen.findByRole('heading', { name: /top 8 countries by population/i })
     const section = ranking.closest('section')
     expect(section).not.toBeNull()
+    // Recharts' ResponsiveContainer measures itself in its own effect, one
+    // render cycle after this section first mounts, so poll instead of
+    // asserting immediately.
+    await waitFor(
+      () => {
+        expect(section?.querySelectorAll('.recharts-bar-rectangle').length).toBeGreaterThan(0)
+      },
+      { timeout: 5000 }
+    )
     expect(within(section as HTMLElement).getByText('India')).toBeInTheDocument()
-    expect(within(section as HTMLElement).getByText('United States')).toBeInTheDocument()
+    // Recharts wraps long axis labels across multiple <tspan> lines (with the
+    // space consumed by the line break), so join them back together to check.
+    const labels = Array.from(section?.querySelectorAll('.recharts-yAxis-tick-labels text') ?? [])
+    const labelTexts = labels.map((label) =>
+      Array.from(label.querySelectorAll('tspan'))
+        .map((tspan) => tspan.textContent)
+        .join(' ')
+    )
+    expect(labelTexts).toContain('United States')
   })
 })
