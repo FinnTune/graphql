@@ -35,6 +35,7 @@ const typeDefs = /* GraphQL */ `
     timezones: [String!]
     languages: JSON
     independent: Boolean
+    ccn3: String
   }
 
   type Query {

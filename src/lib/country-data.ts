@@ -9,6 +9,8 @@ export type Country = {
   timezones?: string[]
   languages?: Record<string, string>
   independent?: boolean
+  /** ISO 3166-1 numeric code, zero-padded (e.g. "840" for the US). Used to match map geometries. */
+  ccn3?: string
 }
 
 export type RegionStats = {
@@ -20,7 +22,7 @@ export type RegionStats = {
 export type SortOption = 'population' | 'density' | 'name'
 
 export const REST_COUNTRIES_URL =
-  'https://restcountries.com/v3.1/all?fields=name,population,area,region,capital,flags,subregion,timezones,languages,independent'
+  'https://restcountries.com/v3.1/all?fields=name,population,area,region,capital,flags,subregion,timezones,languages,independent,ccn3'
 
 export function formatNumber(value: number): string {
   return new Intl.NumberFormat().format(value)

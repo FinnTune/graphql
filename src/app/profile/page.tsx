@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { fetchCountriesViaGraphQL } from '@/lib/graphql-client'
+import WorldMap from '@/app/profile/WorldMap'
 import {
   buildRegionStats,
   countIndependent,
@@ -35,6 +36,7 @@ export default function Profile() {
   const [sortBy, setSortBy] = useState<SortOption>('population')
   const [compareASelection, setCompareASelection] = useState('')
   const [compareBSelection, setCompareBSelection] = useState('')
+  const [mapSelection, setMapSelection] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchCountries() {
@@ -96,6 +98,10 @@ export default function Profile() {
   const comparisonMaxes = useMemo(
     () => getComparisonMaxes(compareCountryA, compareCountryB),
     [compareCountryA, compareCountryB]
+  )
+  const mapSelectedCountry = useMemo(
+    () => (mapSelection ? findCountryByName(filteredCountries, mapSelection) : null),
+    [filteredCountries, mapSelection]
   )
 
   if (loading) {
@@ -166,6 +172,37 @@ export default function Profile() {
           <p className="mt-2 text-2xl font-semibold">{formatNumber(countriesWithLanguageData)}</p>
         </article>
       </section>
+
+      <WorldMap
+        countries={filteredCountries}
+        selectedCountry={mapSelection}
+        onSelectCountry={setMapSelection}
+      />
+
+      {mapSelectedCountry ? (
+        <section className="rounded-xl border border-indigo-200 bg-white p-6 shadow-sm dark:border-indigo-900 dark:bg-slate-900">
+          <div className="flex gap-4">
+            {mapSelectedCountry.flags?.png ? (
+              <Image
+                src={mapSelectedCountry.flags.png}
+                alt={`${mapSelectedCountry.name.common} flag`}
+                className="h-16 w-24 rounded object-cover"
+                width={96}
+                height={64}
+                unoptimized
+              />
+            ) : null}
+            <div className="text-sm">
+              <p className="text-lg font-semibold">{mapSelectedCountry.name.common}</p>
+              <p>Region: {mapSelectedCountry.region}</p>
+              <p>Capital: {mapSelectedCountry.capital?.[0] ?? 'Unknown'}</p>
+              <p>Population: {formatNumber(mapSelectedCountry.population)}</p>
+              <p>Density: {density(mapSelectedCountry).toFixed(1)} people/km2</p>
+              <p>Languages: {formatLanguageList(mapSelectedCountry.languages)}</p>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <h2 className="text-xl font-semibold">Top 8 Countries by Population</h2>

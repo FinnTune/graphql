@@ -11,6 +11,7 @@ export const japan: Country = {
   timezones: ['UTC+09:00'],
   languages: { jpn: 'Japanese' },
   independent: true,
+  ccn3: '392',
 }
 
 export const monaco: Country = {
@@ -24,6 +25,7 @@ export const monaco: Country = {
   timezones: ['UTC+01:00'],
   languages: { fra: 'French' },
   independent: true,
+  ccn3: '492',
 }
 
 export const unitedStates: Country = {
@@ -37,6 +39,7 @@ export const unitedStates: Country = {
   timezones: ['UTC-05:00'],
   languages: { eng: 'English' },
   independent: true,
+  ccn3: '840',
 }
 
 export const india: Country = {
@@ -50,6 +53,7 @@ export const india: Country = {
   timezones: ['UTC+05:30'],
   languages: { hin: 'Hindi', eng: 'English' },
   independent: true,
+  ccn3: '356',
 }
 
 export const brazil: Country = {
@@ -60,6 +64,7 @@ export const brazil: Country = {
   subregion: 'South America',
   capital: ['Brasília'],
   independent: true,
+  ccn3: '076',
 }
 
 export const invalidCountry: Country = {

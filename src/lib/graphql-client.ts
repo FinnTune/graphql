@@ -19,6 +19,7 @@ export const COUNTRIES_QUERY = /* GraphQL */ `
       timezones
       languages
       independent
+      ccn3
     }
   }
 `
