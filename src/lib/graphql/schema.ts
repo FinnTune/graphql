@@ -47,8 +47,16 @@ const typeDefs = /* GraphQL */ `
   }
 `
 
+// Country population/area/capital data changes on the order of months, not
+// minutes, so cache the upstream response server-side instead of hitting
+// REST Countries on every single dashboard load. Next.js's fetch cache
+// serves subsequent requests within the window straight from cache.
+const COUNTRIES_CACHE_SECONDS = 60 * 60 * 6
+
 async function fetchCountries() {
-  const response = await fetch(REST_COUNTRIES_URL)
+  const response = await fetch(REST_COUNTRIES_URL, {
+    next: { revalidate: COUNTRIES_CACHE_SECONDS },
+  })
   if (!response.ok) {
     throw new Error(`REST Countries request failed with status ${response.status}`)
   }

@@ -36,7 +36,10 @@ describe('GraphQL /api/graphql route', () => {
     const response = await postGraphQL(COUNTRIES_QUERY)
     const json = await response.json()
 
-    expect(fetch).toHaveBeenCalledWith(REST_COUNTRIES_URL)
+    expect(fetch).toHaveBeenCalledWith(
+      REST_COUNTRIES_URL,
+      expect.objectContaining({ next: { revalidate: 60 * 60 * 6 } })
+    )
     expect(json.errors).toBeUndefined()
     expect(json.data.countries).toHaveLength(5)
     expect(json.data.countries.map((c: { name: { common: string } }) => c.name.common)).toEqual(
