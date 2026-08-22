@@ -5,6 +5,23 @@ import Profile from '@/app/profile/page'
 import { GRAPHQL_ENDPOINT } from '@/lib/graphql-client'
 import { sampleCountries } from '@/test/fixtures/countries'
 
+const { replaceMock, getSearchParams, setSearchParams } = vi.hoisted(() => {
+  let params = new URLSearchParams()
+  return {
+    replaceMock: vi.fn(),
+    getSearchParams: () => params,
+    setSearchParams: (next: URLSearchParams) => {
+      params = next
+    },
+  }
+})
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ replace: replaceMock, push: vi.fn() }),
+  usePathname: () => '/profile',
+  useSearchParams: () => getSearchParams(),
+}))
+
 function mockCountriesResponse(countries = sampleCountries) {
   vi.stubGlobal(
     'fetch',
@@ -18,6 +35,8 @@ function mockCountriesResponse(countries = sampleCountries) {
 describe('Profile dashboard', () => {
   beforeEach(() => {
     mockCountriesResponse()
+    setSearchParams(new URLSearchParams())
+    replaceMock.mockClear()
   })
 
   afterEach(() => {
@@ -159,5 +178,44 @@ describe('Profile dashboard', () => {
         .join(' ')
     )
     expect(labelTexts).toContain('United States')
+  })
+
+  it('restores query, region, and sort state from the URL on load', async () => {
+    setSearchParams(new URLSearchParams('q=mo&region=Europe&sort=name'))
+    render(<Profile />)
+
+    await screen.findByRole('heading', { name: /global population explorer/i })
+
+    expect(screen.getByPlaceholderText(/search by country or capital/i)).toHaveValue('mo')
+    expect(screen.getByDisplayValue('Europe')).toBeInTheDocument()
+    expect(screen.getByDisplayValue(/sort: name/i)).toBeInTheDocument()
+  })
+
+  it('syncs a region change to the URL via router.replace', async () => {
+    const user = userEvent.setup()
+    render(<Profile />)
+
+    await screen.findByRole('heading', { name: /global population explorer/i })
+    await user.selectOptions(screen.getByDisplayValue('All'), 'Europe')
+
+    // Monaco is the only European country in the fixture, so it also becomes
+    // the (only possible) default compare pair once the region filter narrows.
+    await waitFor(() => {
+      expect(replaceMock).toHaveBeenCalledWith('/profile?region=Europe&a=Monaco&b=Monaco', { scroll: false })
+    })
+  })
+
+  it('omits default values from the URL', async () => {
+    render(<Profile />)
+
+    await screen.findByRole('heading', { name: /global population explorer/i })
+
+    await waitFor(() => {
+      expect(replaceMock).toHaveBeenCalled()
+    })
+    const lastCall = replaceMock.mock.calls.at(-1)?.[0]
+    // Default query/region/sort are omitted; only the resolved default
+    // compare pair (India/United States) ends up in the URL.
+    expect(lastCall).toBe('/profile?a=India&b=United+States')
   })
 })
