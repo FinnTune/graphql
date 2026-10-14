@@ -5,7 +5,7 @@ export default function About() {
         <h1 className="text-3xl font-bold">From School Profile to Global Data Explorer</h1>
         <p className="mt-2 text-indigo-100">
           This app started as a GraphQL student-profile project. It has now evolved into an
-          interactive country analytics dashboard powered by live public data.
+          interactive country analytics dashboard powered by public data.
         </p>
       </section>
 
@@ -22,19 +22,30 @@ export default function About() {
         <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <h2 className="text-xl font-semibold">Data Source</h2>
           <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
-            The dashboard uses the REST Countries API and fetches live data for population,
-            area, region, capital, timezones, and language metadata.
-          </p>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-            Endpoint:{' '}
+            Country data is served by this app&apos;s own GraphQL API from a bundled snapshot:
+            names, codes, areas and languages from{' '}
             <a
-              href="https://restcountries.com/"
+              href="https://github.com/mledoze/countries"
               target="_blank"
               rel="noreferrer"
               className="text-indigo-600 hover:underline"
             >
-              restcountries.com
+              mledoze/countries
             </a>
+            , and population figures from the{' '}
+            <a
+              href="https://data.worldbank.org/indicator/SP.POP.TOTL"
+              target="_blank"
+              rel="noreferrer"
+              className="text-indigo-600 hover:underline"
+            >
+              World Bank
+            </a>
+            .
+          </p>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+            The keyless REST Countries API this project originally used has been retired, so the
+            snapshot makes the app work for everyone without an API key.
           </p>
         </article>
       </section>

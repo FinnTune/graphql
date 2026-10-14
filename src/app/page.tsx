@@ -17,12 +17,13 @@ export default function Home() {
       <h1 className="text-4xl font-bold tracking-tight">World Explorer Dashboard</h1>
       <p className="max-w-2xl text-lg text-slate-600 dark:text-slate-300">
         The original private data source is no longer available, so this project now
-        uses live public country data to power an interactive profile-style dashboard.
+        uses public country data, served through its own GraphQL API, to power an
+        interactive dashboard.
       </p>
 
       <div className="flex gap-4">
         <Link
-          href="/profile"
+          href="/explore"
           className="rounded-lg bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-500"
         >
           Open Dashboard

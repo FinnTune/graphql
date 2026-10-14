@@ -1,28 +1,12 @@
-export type Country = {
-  name: { common: string }
-  population: number
-  area: number
-  region: string
-  capital?: string[]
-  flags?: { png?: string }
-  subregion?: string
-  timezones?: string[]
-  languages?: Record<string, string>
-  independent?: boolean
-  /** ISO 3166-1 numeric code, zero-padded (e.g. "840" for the US). Used to match map geometries. */
-  ccn3?: string
-}
+import type { Country as GraphQLCountry, RegionStats as GraphQLRegionStats } from '@/lib/graphql/schema-types'
 
-export type RegionStats = {
-  region: string
-  countries: number
-  population: number
-}
+// Derived from the GraphQL schema (see src/lib/graphql/type-defs.ts) so the
+// API and the UI can't drift apart. Regenerate with `npm run codegen`.
+export type Country = Omit<GraphQLCountry, '__typename'>
+
+export type RegionStats = Omit<GraphQLRegionStats, '__typename'>
 
 export type SortOption = 'population' | 'density' | 'name'
-
-export const REST_COUNTRIES_URL =
-  'https://restcountries.com/v3.1/all?fields=name,population,area,region,capital,flags,subregion,timezones,languages,independent,ccn3'
 
 export function formatNumber(value: number): string {
   return new Intl.NumberFormat().format(value)
@@ -157,7 +141,7 @@ export function getComparisonMaxes(countryA: Country | null, countryB: Country |
   }
 }
 
-export function formatLanguageList(languages: Record<string, string> | undefined, limit = 3): string {
+export function formatLanguageList(languages: Record<string, string> | null | undefined, limit = 3): string {
   if (!languages) return 'Unknown'
   return Object.values(languages).slice(0, limit).join(', ')
 }

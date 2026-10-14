@@ -8,14 +8,14 @@ describe('Home page', () => {
 
     expect(screen.getByRole('heading', { name: /world explorer dashboard/i })).toBeInTheDocument()
     expect(
-      screen.getByText(/uses live public country data to power an interactive profile-style dashboard/i)
+      screen.getByText(/uses public country data, served through its own graphql api, to power an interactive dashboard/i)
     ).toBeInTheDocument()
   })
 
-  it('links to the profile dashboard and about page', () => {
+  it('links to the explorer dashboard and about page', () => {
     render(<Home />)
 
-    expect(screen.getByRole('link', { name: /open dashboard/i })).toHaveAttribute('href', '/profile')
+    expect(screen.getByRole('link', { name: /open dashboard/i })).toHaveAttribute('href', '/explore')
     expect(screen.getByRole('link', { name: /about/i })).toHaveAttribute('href', '/about')
   })
 

@@ -1,13 +1,13 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import ProfileLayout from '@/app/profile/layout'
+import ExplorerLayout from '@/app/explore/layout'
 
-describe('Profile layout', () => {
+describe('Explorer layout', () => {
   it('renders navigation and child content', () => {
     render(
-      <ProfileLayout>
+      <ExplorerLayout>
         <p>Dashboard content</p>
-      </ProfileLayout>
+      </ExplorerLayout>
     )
 
     expect(screen.getByText('World Explorer')).toBeInTheDocument()

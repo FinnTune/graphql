@@ -63,3 +63,11 @@ vi.mock('next/link', () => ({
     className?: string
   }) => React.createElement('a', { href, className }, children),
 }))
+
+// Resolvers read countries from this module; tests swap in small fixtures via
+// vi.mocked(loadCountries) instead of the full bundled snapshot.
+vi.mock('@/lib/countries-source', async () => {
+  const { sampleCountries } = await import('@/test/fixtures/countries')
+  const { filterValidCountries } = await import('@/lib/country-data')
+  return { loadCountries: vi.fn(async () => filterValidCountries(sampleCountries)) }
+})

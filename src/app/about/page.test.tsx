@@ -22,11 +22,16 @@ describe('About page', () => {
     expect(screen.getByText(/explore regional snapshots and top population rankings/i)).toBeInTheDocument()
   })
 
-  it('links to the REST Countries API', () => {
+  it('credits the data sources', () => {
     render(<About />)
 
-    const link = screen.getByRole('link', { name: /restcountries.com/i })
-    expect(link).toHaveAttribute('href', 'https://restcountries.com/')
-    expect(link).toHaveAttribute('target', '_blank')
+    for (const [name, href] of [
+      [/mledoze\/countries/i, 'https://github.com/mledoze/countries'],
+      [/world bank/i, 'https://data.worldbank.org/indicator/SP.POP.TOTL'],
+    ] as const) {
+      const link = screen.getByRole('link', { name })
+      expect(link).toHaveAttribute('href', href)
+      expect(link).toHaveAttribute('target', '_blank')
+    }
   })
 })

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-export default function ProfileLayout({
+export default function ExplorerLayout({
   children,
 }: {
   children: React.ReactNode

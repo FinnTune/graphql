@@ -1,6 +1,12 @@
-import { createSchema } from 'graphql-yoga'
+import { createGraphQLError, createSchema } from 'graphql-yoga'
 import { GraphQLScalarType, Kind } from 'graphql'
-import { REST_COUNTRIES_URL, filterValidCountries } from '@/lib/country-data'
+import {
+  buildRegionStats,
+  filterAndSortCountries,
+  type SortOption,
+} from '@/lib/country-data'
+import { loadCountries } from '@/lib/countries-source'
+import { typeDefs } from '@/lib/graphql/type-defs'
 
 const JSONScalar = new GraphQLScalarType({
   name: 'JSON',
@@ -13,56 +19,19 @@ const JSONScalar = new GraphQLScalarType({
   },
 })
 
-const typeDefs = /* GraphQL */ `
-  scalar JSON
+export const MAX_COUNTRIES_LIMIT = 300
 
-  type CountryName {
-    common: String!
-  }
+const SORT_ENUM_TO_OPTION: Record<string, SortOption> = {
+  POPULATION: 'population',
+  DENSITY: 'density',
+  NAME: 'name',
+}
 
-  type Flags {
-    png: String
-  }
-
-  type Country {
-    name: CountryName!
-    population: Float!
-    area: Float!
-    region: String!
-    subregion: String
-    capital: [String!]
-    flags: Flags
-    timezones: [String!]
-    languages: JSON
-    independent: Boolean
-    ccn3: String
-  }
-
-  type Query {
-    """
-    All countries with valid population/area/region data, sourced live
-    from the REST Countries API and normalized server-side.
-    """
-    countries: [Country!]!
-  }
-`
-
-// Country population/area/capital data changes on the order of months, not
-// minutes, so cache the upstream response server-side instead of hitting
-// REST Countries on every single dashboard load. Next.js's fetch cache
-// serves subsequent requests within the window straight from cache.
-const COUNTRIES_CACHE_SECONDS = 60 * 60 * 6
-
-async function fetchCountries() {
-  const response = await fetch(REST_COUNTRIES_URL, {
-    next: { revalidate: COUNTRIES_CACHE_SECONDS },
-  })
-  if (!response.ok) {
-    throw new Error(`REST Countries request failed with status ${response.status}`)
-  }
-
-  const json = await response.json()
-  return filterValidCountries(json)
+type CountriesArgs = {
+  search?: string | null
+  region?: string | null
+  sortBy?: string | null
+  limit?: number | null
 }
 
 export const schema = createSchema({
@@ -70,7 +39,25 @@ export const schema = createSchema({
   resolvers: {
     JSON: JSONScalar,
     Query: {
-      countries: () => fetchCountries(),
+      countries: async (_root: unknown, args: CountriesArgs) => {
+        if (args.limit != null && (args.limit < 1 || args.limit > MAX_COUNTRIES_LIMIT)) {
+          throw createGraphQLError(`limit must be between 1 and ${MAX_COUNTRIES_LIMIT}`)
+        }
+
+        const countries = await loadCountries()
+        const result = filterAndSortCountries(
+          countries,
+          args.search ?? '',
+          args.region ?? 'All',
+          SORT_ENUM_TO_OPTION[args.sortBy ?? 'POPULATION'] ?? 'population'
+        )
+        return args.limit != null ? result.slice(0, args.limit) : result
+      },
+      regions: async () => {
+        const countries = await loadCountries()
+        return Array.from(new Set(countries.map((country) => country.region))).sort()
+      },
+      regionStats: async () => buildRegionStats(await loadCountries()),
     },
   },
 })

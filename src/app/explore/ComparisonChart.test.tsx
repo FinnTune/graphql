@@ -1,6 +1,6 @@
-import { render, waitFor, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import ComparisonChart, { buildComparisonRows } from '@/app/profile/ComparisonChart'
+import ComparisonChart, { buildComparisonRows } from '@/app/explore/ComparisonChart'
 import { japan, monaco } from '@/test/fixtures/countries'
 
 describe('buildComparisonRows', () => {
@@ -36,11 +36,18 @@ describe('ComparisonChart', () => {
     // span attached directly to `document.body` (outside this component's
     // tree) that can echo the same axis-label text and confuse `screen`-wide
     // queries across tests.
-    const scoped = within(container)
+    const scoped = within(container.querySelector('[aria-hidden="true"]') as HTMLElement)
     expect(scoped.getByText('Population')).toBeInTheDocument()
     expect(scoped.getByText('Area')).toBeInTheDocument()
     expect(scoped.getByText('Density')).toBeInTheDocument()
     expect(scoped.getAllByText('Japan').length).toBeGreaterThan(0)
     expect(scoped.getAllByText('Monaco').length).toBeGreaterThan(0)
+  })
+
+  it('offers the same numbers as an accessible table', () => {
+    render(<ComparisonChart countryA={japan} countryB={monaco} />)
+
+    const table = screen.getByRole('table', { name: /japan compared with monaco/i })
+    expect(within(table).getByRole('row', { name: /population 125,000,000 39,000/i })).toBeInTheDocument()
   })
 })

@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import WorldMap from '@/app/profile/WorldMap'
+import WorldMap from '@/app/explore/WorldMap'
 import { japan, monaco, unitedStates } from '@/test/fixtures/countries'
 
 const countries = [japan, monaco, unitedStates]
@@ -10,10 +10,22 @@ describe('WorldMap', () => {
   it('renders an svg map with a clickable path for each matched country', () => {
     render(<WorldMap countries={countries} selectedCountry={null} onSelectCountry={vi.fn()} />)
 
-    expect(screen.getByRole('img', { name: /world map/i })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: /world map/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Japan' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Monaco' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'United States' })).toBeInTheDocument()
+  })
+
+  it('offers the map values as an accessible table, largest first', () => {
+    render(<WorldMap countries={countries} selectedCountry={null} onSelectCountry={vi.fn()} />)
+
+    const rows = within(screen.getByRole('table')).getAllByRole('row')
+    expect(rows.map((row) => row.textContent)).toEqual([
+      'CountryPopulation',
+      expect.stringContaining('United States'),
+      expect.stringContaining('Japan'),
+      expect.stringContaining('Monaco'),
+    ])
   })
 
   it('calls onSelectCountry with the country name when a matched country is clicked', async () => {

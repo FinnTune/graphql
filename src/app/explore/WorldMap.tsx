@@ -32,7 +32,7 @@ export default function WorldMap({ countries, selectedCountry, onSelectCountry }
   const valueIndex = useMemo(() => buildCountryValueIndex(countries, metric), [countries, metric])
   const { min, max } = useMemo(
     () => getValueRange(Array.from(valueIndex.values()).map((entry) => entry.value)),
-    [valueIndex]
+    [valueIndex],
   )
 
   return (
@@ -40,7 +40,7 @@ export default function WorldMap({ countries, selectedCountry, onSelectCountry }
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold">World Map</h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
             Click a highlighted country to see its details. Shading reflects your current filter.
           </p>
         </div>
@@ -65,8 +65,8 @@ export default function WorldMap({ countries, selectedCountry, onSelectCountry }
 
       <svg
         viewBox={WORLD_MAP_VIEWBOX}
-        role="img"
-        aria-label="World map colored by the selected metric"
+        role="group"
+        aria-label={`World map colored by ${METRIC_LABELS[metric].toLowerCase()}. Each highlighted country is a button.`}
         className="mt-4 h-auto w-full"
       >
         {features.map((countryFeature, index) => {
@@ -99,7 +99,12 @@ export default function WorldMap({ countries, selectedCountry, onSelectCountry }
                     }
                   : undefined
               }
-              className={match ? 'cursor-pointer transition-opacity hover:opacity-80' : undefined}
+              aria-pressed={match ? isSelected : undefined}
+              className={
+                match
+                  ? 'cursor-pointer transition-opacity hover:opacity-80 focus:outline-none focus-visible:stroke-indigo-600 focus-visible:stroke-[2.5]'
+                  : undefined
+              }
             >
               <title>
                 {match
@@ -113,7 +118,42 @@ export default function WorldMap({ countries, selectedCountry, onSelectCountry }
         })}
       </svg>
 
-      <div className="mt-4 flex items-center gap-3 text-xs text-slate-500">
+      <details className="mt-4 text-sm">
+        <summary className="cursor-pointer font-medium text-indigo-700 dark:text-indigo-300">
+          View map data as a table
+        </summary>
+        <div className="mt-2 max-h-64 overflow-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="sticky top-0 bg-white dark:bg-slate-900">
+              <tr>
+                <th scope="col" className="py-1 pr-4">
+                  Country
+                </th>
+                <th scope="col" className="py-1">
+                  {METRIC_LABELS[metric]}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from(valueIndex.values())
+                .sort((a, b) => b.value - a.value)
+                .map(({ country, value }) => (
+                  <tr key={country.name.common}>
+                    <th scope="row" className="py-0.5 pr-4 font-normal">
+                      {country.name.common}
+                    </th>
+                    <td className="py-0.5">
+                      {formatNumber(Math.round(value))}
+                      {metric === 'density' ? '/km2' : ''}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <div className="mt-4 flex items-center gap-3 text-xs text-slate-600 dark:text-slate-400">
         <span>Low</span>
         <div
           className="h-2 flex-1 rounded"

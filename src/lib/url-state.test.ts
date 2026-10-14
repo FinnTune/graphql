@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { buildProfileSearchParams, parseProfileSearchParams, PROFILE_URL_DEFAULTS } from '@/lib/url-state'
+import { buildExplorerSearchParams, parseExplorerSearchParams, EXPLORER_URL_DEFAULTS } from '@/lib/url-state'
 
-describe('parseProfileSearchParams', () => {
+describe('parseExplorerSearchParams', () => {
   it('returns defaults when no params are present', () => {
-    expect(parseProfileSearchParams(new URLSearchParams())).toEqual(PROFILE_URL_DEFAULTS)
+    expect(parseExplorerSearchParams(new URLSearchParams())).toEqual(EXPLORER_URL_DEFAULTS)
   })
 
   it('reads query, region, sort, and compare selections', () => {
     const params = new URLSearchParams('q=japan&region=Asia&sort=density&a=Japan&b=Monaco')
-    expect(parseProfileSearchParams(params)).toEqual({
+    expect(parseExplorerSearchParams(params)).toEqual({
       query: 'japan',
       region: 'Asia',
       sortBy: 'density',
@@ -19,17 +19,17 @@ describe('parseProfileSearchParams', () => {
 
   it('falls back to the default sort for an invalid sort value', () => {
     const params = new URLSearchParams('sort=not-a-real-option')
-    expect(parseProfileSearchParams(params).sortBy).toBe('population')
+    expect(parseExplorerSearchParams(params).sortBy).toBe('population')
   })
 })
 
-describe('buildProfileSearchParams', () => {
+describe('buildExplorerSearchParams', () => {
   it('omits keys that are at their default value', () => {
-    expect(buildProfileSearchParams(PROFILE_URL_DEFAULTS).toString()).toBe('')
+    expect(buildExplorerSearchParams(EXPLORER_URL_DEFAULTS).toString()).toBe('')
   })
 
   it('includes only the keys that differ from their defaults', () => {
-    const params = buildProfileSearchParams({
+    const params = buildExplorerSearchParams({
       query: 'japan',
       region: 'All',
       sortBy: 'name',
@@ -39,8 +39,8 @@ describe('buildProfileSearchParams', () => {
     expect(params.toString()).toBe('q=japan&sort=name')
   })
 
-  it('round-trips through parseProfileSearchParams', () => {
+  it('round-trips through parseExplorerSearchParams', () => {
     const state = { query: 'mo', region: 'Europe', sortBy: 'density' as const, compareA: 'Japan', compareB: 'Monaco' }
-    expect(parseProfileSearchParams(buildProfileSearchParams(state))).toEqual(state)
+    expect(parseExplorerSearchParams(buildExplorerSearchParams(state))).toEqual(state)
   })
 })

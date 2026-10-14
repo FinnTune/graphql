@@ -2,7 +2,7 @@ import type { SortOption } from '@/lib/country-data'
 
 const SORT_OPTIONS: SortOption[] = ['population', 'density', 'name']
 
-export type ProfileUrlState = {
+export type ExplorerUrlState = {
   query: string
   region: string
   sortBy: SortOption
@@ -10,7 +10,7 @@ export type ProfileUrlState = {
   compareB: string
 }
 
-export const PROFILE_URL_DEFAULTS: ProfileUrlState = {
+export const EXPLORER_URL_DEFAULTS: ExplorerUrlState = {
   query: '',
   region: 'All',
   sortBy: 'population',
@@ -22,24 +22,24 @@ function isSortOption(value: string | null): value is SortOption {
   return SORT_OPTIONS.includes(value as SortOption)
 }
 
-export function parseProfileSearchParams(params: URLSearchParams): ProfileUrlState {
+export function parseExplorerSearchParams(params: URLSearchParams): ExplorerUrlState {
   const sortParam = params.get('sort')
 
   return {
-    query: params.get('q') ?? PROFILE_URL_DEFAULTS.query,
-    region: params.get('region') ?? PROFILE_URL_DEFAULTS.region,
-    sortBy: isSortOption(sortParam) ? sortParam : PROFILE_URL_DEFAULTS.sortBy,
-    compareA: params.get('a') ?? PROFILE_URL_DEFAULTS.compareA,
-    compareB: params.get('b') ?? PROFILE_URL_DEFAULTS.compareB,
+    query: params.get('q') ?? EXPLORER_URL_DEFAULTS.query,
+    region: params.get('region') ?? EXPLORER_URL_DEFAULTS.region,
+    sortBy: isSortOption(sortParam) ? sortParam : EXPLORER_URL_DEFAULTS.sortBy,
+    compareA: params.get('a') ?? EXPLORER_URL_DEFAULTS.compareA,
+    compareB: params.get('b') ?? EXPLORER_URL_DEFAULTS.compareB,
   }
 }
 
-export function buildProfileSearchParams(state: ProfileUrlState): URLSearchParams {
+export function buildExplorerSearchParams(state: ExplorerUrlState): URLSearchParams {
   const params = new URLSearchParams()
 
   if (state.query) params.set('q', state.query)
-  if (state.region !== PROFILE_URL_DEFAULTS.region) params.set('region', state.region)
-  if (state.sortBy !== PROFILE_URL_DEFAULTS.sortBy) params.set('sort', state.sortBy)
+  if (state.region !== EXPLORER_URL_DEFAULTS.region) params.set('region', state.region)
+  if (state.sortBy !== EXPLORER_URL_DEFAULTS.sortBy) params.set('sort', state.sortBy)
   if (state.compareA) params.set('a', state.compareA)
   if (state.compareB) params.set('b', state.compareB)
 

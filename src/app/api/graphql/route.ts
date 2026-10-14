@@ -1,14 +1,7 @@
-import { createYoga } from 'graphql-yoga'
-import { schema } from '@/lib/graphql/schema'
-
-const { handleRequest } = createYoga({
-  schema,
-  graphqlEndpoint: '/api/graphql',
-  fetchAPI: { Response },
-})
+import { yoga } from '@/lib/graphql/yoga'
 
 function handler(request: Request) {
-  return handleRequest(request, {})
+  return yoga.handleRequest(request, {})
 }
 
 export { handler as GET, handler as POST, handler as OPTIONS }

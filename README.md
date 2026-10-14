@@ -1,99 +1,96 @@
 # Global Population Explorer
 
-An interactive data dashboard built with Next.js and TypeScript.
+An interactive country-data dashboard built with Next.js, TypeScript, and its own GraphQL API.
 
-This project originally started as a GraphQL school profile assignment, but it was redesigned to work with public data after the original private source became unavailable. The app now uses live country data and focuses on practical exploration features.
+The project started as a GraphQL school-profile assignment and was redesigned around public data
+after the original private source became unavailable.
 
 ## Features
 
-- Live fetch from the REST Countries API
-- Search by country or capital
-- Filter by region
-- Sort by population, density, or name
-- KPI cards that react to active filters
-- Top population ranking with SVG bars
-- Region snapshot summary
-- Spotlight card for the highest-density country
-- Side-by-side country comparison with visual index bars
-- Country explorer cards with language, timezone, and capital info
+- Search by country or capital, filter by region, sort by population, density, or name
+- Filtering, sorting, and search run **server-side** through GraphQL arguments
+- Server-rendered first load for any URL, with no loading spinner
+- Filter, sort, and compare state lives in the URL, so views are shareable and bookmarkable
+- Interactive world map (d3-geo + TopoJSON), lazy-loaded, shaded by population or density
+- Top-8 population ranking and side-by-side country comparison (Recharts)
+- Region snapshot, density spotlight, and KPI cards that react to the active filter
+- Charts and the map have accessible table equivalents; the map is keyboard operable
+- Dark mode
 
-## Tech Stack
+## Tech stack
 
-- Next.js 13 (App Router)
-- React 18
-- TypeScript
-- Tailwind CSS
+- Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4
+- GraphQL Yoga + `graphql` for the API (`/api/graphql`)
+- GraphQL Code Generator for types shared by API and UI
+- Recharts, d3-geo, topojson-client
+- Vitest + Testing Library (unit/integration), Playwright (end-to-end)
 
-## Data Source
-
-- REST Countries API: [https://restcountries.com/](https://restcountries.com/)
-
-The dashboard currently requests:
-
-- `name`
-- `population`
-- `area`
-- `region`
-- `subregion`
-- `capital`
-- `flags`
-- `timezones`
-- `languages`
-- `independent`
-
-## Getting Started
-
-### 1) Install dependencies
+## Getting started
 
 ```bash
+nvm use            # Node 22+ (see .nvmrc)
 npm install
+npm run dev        # http://localhost:3000
 ```
 
-### 2) Run in development
+| Script                  | What it does                                              |
+| ----------------------- | --------------------------------------------------------- |
+| `npm run dev`           | Start the dev server (GraphiQL is available at `/api/graphql`) |
+| `npm run build` / `start` | Production build / server                               |
+| `npm run lint`          | ESLint                                                    |
+| `npm run typecheck`     | `tsc --noEmit`                                            |
+| `npm test`              | Vitest unit and integration tests                         |
+| `npm run test:coverage` | Same, with a coverage report                              |
+| `npm run test:e2e`      | Playwright tests against a production build (`npx playwright install chromium` first) |
+| `npm run codegen`       | Regenerate `src/lib/graphql/{schema-types,operations}.ts`  |
+| `npm run snapshot`      | Rebuild the bundled country dataset                       |
 
-```bash
-npm run dev
+## Architecture
+
+```
+src/lib/graphql/type-defs.ts   schema SDL: the single source of truth
+src/lib/graphql/schema.ts      resolvers (filter / sort / limit on the server)
+src/lib/graphql/security.ts    query depth + length limits, introspection off in production
+src/lib/graphql/documents.ts   the explorer query used by both server and browser
+src/lib/graphql/yoga.ts        the Yoga instance shared by the route and server rendering
+src/app/explore/page.tsx       server component: runs the query for the URL state
+src/app/explore/useCountryExplorer.ts   client state, debounced refetch, URL sync
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+After editing `type-defs.ts` or `documents.ts`, run `npm run codegen` (CI fails if the generated
+files are stale).
 
-### 3) Run lint
+### Example query
 
-```bash
-npm run lint
+```graphql
+{
+  countries(region: "Europe", search: "land", sortBy: DENSITY, limit: 5) {
+    name { common }
+    population
+    capital
+  }
+  regions
+  regionStats { region countries population }
+}
 ```
 
-## Project Structure
+## Data
 
-- `src/app/page.tsx` - Landing page
-- `src/app/profile/page.tsx` - Main interactive dashboard
-- `src/app/profile/layout.tsx` - Dashboard layout/header
-- `src/app/about/page.tsx` - Product-focused about page
-- `src/app/about/error.tsx` - Route-level error UI
-- `src/app/about/loading.tsx` - Route-level loading UI
+The app serves a bundled snapshot, `src/data/countries-snapshot.json`, because the keyless REST
+Countries v3.1 API it originally used has been retired (v5 requires an API key). The snapshot is
+built by `npm run snapshot` from:
 
-## UX Goals
+- [mledoze/countries](https://github.com/mledoze/countries) (ODbL): names, codes, region, capital, area, languages
+- [World Bank SP.POP.TOTL](https://data.worldbank.org/indicator/SP.POP.TOTL) (CC BY 4.0): population
+- [countries-and-timezones](https://github.com/manuelmhtr/countries-and-timezones): time zones
+- [flagcdn.com](https://flagcdn.com): flag images
 
-- Make global data exploration immediate and useful
-- Keep controls simple but expressive
-- Provide meaningful visual comparison at a glance
-- Stay accessible and responsive across screen sizes
+Population figures are the World Bank's most recent value, so rerun `npm run snapshot` occasionally.
+To use a live API instead, replace `loadCountries()` in `src/lib/countries-source.ts`; nothing else
+depends on where the data comes from.
 
-## Roadmap Ideas
+Map geometry: `src/data/world-countries-50m.json` (see its license file).
 
-- Add continent map view with selectable markers
-- Add trend/history mode using another open dataset
-- Add bookmarking/favorites with local storage
-- Add export (CSV/JSON) for filtered result sets
-- Add test coverage for core data transformations
+## License
 
-## Notes
-
-- This repository still uses the original project name (`graphql`) for compatibility with existing setup and scripts.
-- The app no longer depends on private auth/JWT flows.
-
-## Copyright and License
-
-Copyright (C) 2026 Andre J. Teetor
-
-This project is licensed under GNU GPL v2.0. See `LICENSE` for details.
+GPL-2.0, see [LICENSE](LICENSE).
