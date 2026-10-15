@@ -1,0 +1,55 @@
+name: Refresh countries snapshot
+
+on:
+  schedule:
+    # 06:00 UTC on the 1st of every month
+    - cron: '0 6 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Rebuild snapshot
+        run: npm run snapshot
+
+      - name: Open a pull request if the data changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- src/data/countries-snapshot.json; then
+            echo "Snapshot is already up to date."
+            exit 0
+          fi
+
+          branch="chore/refresh-countries-snapshot-$(date +%Y-%m)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add src/data/countries-snapshot.json
+          git commit -m "Refresh countries snapshot"
+          git push --force origin "$branch"
+
+          gh pr create \
+            --base "${{ github.event.repository.default_branch }}" \
+            --head "$branch" \
+            --title "Refresh countries snapshot ($(date +%Y-%m))" \
+            --body "Automated monthly rebuild of \`src/data/countries-snapshot.json\` via \`npm run snapshot\`. Review the diff for unexpected population or area changes before merging." \
+            || echo "A pull request for $branch probably already exists."

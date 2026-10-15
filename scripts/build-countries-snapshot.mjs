@@ -111,6 +111,21 @@ const snapshot = countries
   })
   .sort((a, b) => a.name.common.localeCompare(b.name.common))
 
+// Refuse to write a broken snapshot (e.g. an upstream outage or schema change
+// that silently drops data), so the scheduled refresh fails instead of
+// opening a PR full of bad numbers.
+const totalPopulation = snapshot.reduce((sum, country) => sum + country.population, 0)
+if (
+  snapshot.length < 200 ||
+  totalPopulation < 7_000_000_000 ||
+  totalPopulation > 9_000_000_000 ||
+  snapshot.filter((country) => !country.population).length > 10
+) {
+  throw new Error(
+    `Snapshot failed sanity checks: ${snapshot.length} countries, ${totalPopulation} total population`
+  )
+}
+
 await writeFile(
   new URL('../src/data/countries-snapshot.json', import.meta.url),
   `${JSON.stringify(snapshot)}\n`

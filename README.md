@@ -85,7 +85,9 @@ built by `npm run snapshot` from:
 - [countries-and-timezones](https://github.com/manuelmhtr/countries-and-timezones): time zones
 - [flagcdn.com](https://flagcdn.com): flag images
 
-Population figures are the World Bank's most recent value, so rerun `npm run snapshot` occasionally.
+Population figures are the World Bank's most recent value. A monthly GitHub Action
+(`.github/workflows/refresh-snapshot.yml`) rebuilds the snapshot and opens a PR if anything changed;
+the script refuses to write a snapshot that fails basic sanity checks.
 To use a live API instead, replace `loadCountries()` in `src/lib/countries-source.ts`; nothing else
 depends on where the data comes from.
 
