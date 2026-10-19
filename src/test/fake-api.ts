@@ -16,12 +16,8 @@ export function installFakeApi(countries: Country[] = sampleCountries) {
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input)
 
-    if (url === GRAPHQL_ENDPOINT) {
-      const response = await yoga.fetch(`http://localhost${url}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: String(init?.body),
-      })
+    if (url.startsWith(`${GRAPHQL_ENDPOINT}?`)) {
+      const response = await yoga.fetch(`http://localhost${url}`, { signal: init?.signal ?? undefined })
       const payload = await response.json()
       return { ok: response.ok, status: response.status, json: async () => payload } as Response
     }
@@ -34,5 +30,11 @@ export function installFakeApi(countries: Country[] = sampleCountries) {
 }
 
 export function graphqlCalls(fetchMock: ReturnType<typeof installFakeApi>) {
-  return fetchMock.mock.calls.filter(([url]) => String(url) === GRAPHQL_ENDPOINT)
+  return fetchMock.mock.calls.filter(([url]) => String(url).startsWith(`${GRAPHQL_ENDPOINT}?`))
+}
+
+/** The GraphQL variables a recorded client request was sent with. */
+export function variablesOf(call: Parameters<typeof fetch>) {
+  const url = new URL(String(call[0]), 'http://localhost')
+  return JSON.parse(url.searchParams.get('variables') ?? '{}')
 }

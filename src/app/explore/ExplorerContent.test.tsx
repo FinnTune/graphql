@@ -3,9 +3,9 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import ExplorerContent from '@/app/explore/ExplorerContent'
 import { loadExplorerData } from '@/lib/graphql/execute-explorer'
-import { GRAPHQL_ENDPOINT, toExplorerVariables } from '@/lib/graphql-client'
+import { toExplorerVariables } from '@/lib/graphql-client'
 import { EXPLORER_URL_DEFAULTS, type ExplorerUrlState } from '@/lib/url-state'
-import { graphqlCalls, installFakeApi } from '@/test/fake-api'
+import { graphqlCalls, installFakeApi, variablesOf } from '@/test/fake-api'
 
 const { replaceMock } = vi.hoisted(() => ({ replaceMock: vi.fn() }))
 
@@ -51,7 +51,7 @@ describe('Explorer dashboard', () => {
 
     expect(screen.getByText(/loading global data/i)).toBeInTheDocument()
     expect(await screen.findByRole('heading', { name: /global population explorer/i })).toBeInTheDocument()
-    expect(fetch).toHaveBeenCalledWith(GRAPHQL_ENDPOINT, expect.objectContaining({ method: 'POST' }))
+    expect(graphqlCalls(vi.mocked(fetch))).toHaveLength(1)
   })
 
   it('shows an error with a retry button, and recovers on retry', async () => {
@@ -95,7 +95,7 @@ describe('Explorer dashboard', () => {
     // Typing is debounced into a single request, with the final text.
     const calls = graphqlCalls(fetchMock)
     expect(calls).toHaveLength(1)
-    expect(JSON.parse(String(calls[0][1]?.body)).variables).toMatchObject({ search: 'monaco' })
+    expect(variablesOf(calls[0])).toMatchObject({ search: 'monaco' })
   })
 
   it('filters countries by region', async () => {

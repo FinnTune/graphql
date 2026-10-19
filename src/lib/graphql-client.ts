@@ -48,12 +48,10 @@ export async function fetchExplorerData(
   variables: ExplorerQueryVariables,
   signal?: AbortSignal
 ): Promise<ExplorerData> {
-  const response = await fetch(GRAPHQL_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query: EXPLORER_QUERY, variables }),
-    signal,
-  })
+  // GET (not POST) so identical filter views share one CDN/browser-cached
+  // response; the server marks successful GET results as cacheable.
+  const params = new URLSearchParams({ query: EXPLORER_QUERY, variables: JSON.stringify(variables) })
+  const response = await fetch(`${GRAPHQL_ENDPOINT}?${params}`, { signal })
 
   if (!response.ok) {
     throw new Error(`Request failed with status ${response.status}`)

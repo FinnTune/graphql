@@ -1,5 +1,6 @@
 import { createYoga } from 'graphql-yoga'
 import { schema } from '@/lib/graphql/schema'
+import { cachingPlugin } from '@/lib/graphql/caching'
 import { securityPlugin } from '@/lib/graphql/security'
 
 export const GRAPHQL_PATH = '/api/graphql'
@@ -11,5 +12,5 @@ export const yoga = createYoga({
   graphqlEndpoint: GRAPHQL_PATH,
   fetchAPI: { Response },
   graphiql: !isProduction,
-  plugins: [securityPlugin({ production: isProduction })],
+  plugins: [securityPlugin({ production: isProduction }), cachingPlugin()],
 })

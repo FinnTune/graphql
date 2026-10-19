@@ -43,6 +43,30 @@ test.describe('explorer', () => {
     await expect(page.getByText('Capital: Tokyo').first()).toBeVisible()
   })
 
+  test('the map zooms, pans, and shows a tooltip on hover', async ({ page }) => {
+    await page.goto('/explore')
+    const group = page.locator('svg > g').first()
+    await expect(group).toHaveAttribute('transform', 'translate(0 0) scale(1)')
+
+    await page.getByRole('button', { name: 'Zoom in' }).click()
+    await page.getByRole('button', { name: 'Zoom in' }).click()
+    await expect(group).toHaveAttribute('transform', /scale\(2\.25\)/)
+
+    const svg = page.getByRole('group', { name: /world map/i })
+    const box = (await svg.boundingBox())!
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(box.x + box.width / 2 - 120, box.y + box.height / 2 - 40, { steps: 5 })
+    await page.mouse.up()
+    await expect(group).not.toHaveAttribute('transform', /translate\(-?0 -?0\)/)
+
+    await page.getByRole('button', { name: 'Reset' }).click()
+    await expect(group).toHaveAttribute('transform', 'translate(0 0) scale(1)')
+
+    await page.getByRole('button', { name: 'Japan', exact: true }).hover()
+    await expect(page.getByRole('presentation').filter({ hasText: 'Japan:' })).toBeVisible()
+  })
+
   test('the old /profile URL redirects to /explore and keeps the query string', async ({ page }) => {
     await page.goto('/profile?region=Asia')
 
@@ -60,6 +84,15 @@ test.describe('graphql api (production hardening)', () => {
     const json = await response.json()
 
     expect(json.data.countries).toHaveLength(1)
+  })
+
+  test('lets successful GET queries be cached and POSTs not', async ({ request }) => {
+    const query = encodeURIComponent('{ regions }')
+    const get = await request.get(`/api/graphql?query=${query}`)
+    expect(get.headers()['cache-control']).toContain('s-maxage=3600')
+
+    const postResponse = await post(request, '{ regions }')
+    expect(postResponse.headers()['cache-control'] ?? '').not.toContain('s-maxage')
   })
 
   test('has introspection disabled', async ({ request }) => {

@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { POST } from '@/app/api/graphql/route'
+import { GET, POST, RATE_LIMIT_PER_MINUTE } from '@/app/api/graphql/route'
+import { CACHE_CONTROL } from '@/lib/graphql/caching'
 import { filterValidCountries } from '@/lib/country-data'
 import { loadCountries } from '@/lib/countries-source'
 import { EXPLORER_QUERY } from '@/lib/graphql-client'
@@ -145,5 +146,44 @@ describe('GraphQL /api/graphql route', () => {
     ).json()
 
     expect(json.errors?.[0]?.message).toMatch(/maximum length/)
+  })
+
+  it('marks successful GET queries as cacheable', async () => {
+    const url = `http://localhost/api/graphql?query=${encodeURIComponent('{ regions }')}`
+
+    const response = await GET(new Request(url))
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('Cache-Control')).toBe(CACHE_CONTROL)
+  })
+
+  it('does not mark POST responses or error responses as cacheable', async () => {
+    const post = await postGraphQL('{ regions }')
+    expect(post.headers.get('Cache-Control')).toBeNull()
+
+    const invalid = await GET(
+      new Request(`http://localhost/api/graphql?query=${encodeURIComponent('{ nope }')}`)
+    )
+    expect(invalid.headers.get('Cache-Control')).toBeNull()
+  })
+
+  it('rate limits a client that sends too many requests, per client IP', async () => {
+    const request = (ip: string) =>
+      POST(
+        new Request('http://localhost/api/graphql', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-forwarded-for': ip },
+          body: JSON.stringify({ query: '{ regions }' }),
+        })
+      )
+
+    for (let i = 0; i < RATE_LIMIT_PER_MINUTE; i++) {
+      expect((await request('203.0.113.9')).status).toBe(200)
+    }
+    const limited = await request('203.0.113.9')
+
+    expect(limited.status).toBe(429)
+    expect(Number(limited.headers.get('Retry-After'))).toBeGreaterThan(0)
+    expect((await request('198.51.100.7')).status).toBe(200)
   })
 })

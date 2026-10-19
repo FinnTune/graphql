@@ -12,6 +12,11 @@ export function formatNumber(value: number): string {
   return new Intl.NumberFormat().format(value)
 }
 
+/** Short form for tight spaces, e.g. 1,400,000,000 -> 1.4B. */
+export function formatCompact(value: number): string {
+  return new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(value)
+}
+
 export function density(country: Country): number {
   return country.population / country.area
 }
