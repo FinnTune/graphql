@@ -55,6 +55,23 @@ export function getValueRange(values: number[]): { min: number; max: number } {
   return { min: Math.min(...values), max: Math.max(...values) }
 }
 
+/**
+ * Range for coloring: like getValueRange, but ignoring the most extreme
+ * `trim` fraction at each end. A handful of near-uninhabited territories
+ * (population 1-50) would otherwise stretch the low end of the scale and
+ * wash out the countries people actually care about. Values outside the
+ * range simply clamp to the end colors.
+ */
+export function getScaleRange(values: number[], trim = 0.03): { min: number; max: number } {
+  if (!values.length) return { min: 0, max: 0 }
+  const sorted = [...values].sort((a, b) => a - b)
+  const last = sorted.length - 1
+  return {
+    min: sorted[Math.floor(last * trim)],
+    max: sorted[Math.ceil(last * (1 - trim))],
+  }
+}
+
 const MAP_COLOR_LOW: [number, number, number] = [224, 231, 255] // indigo-100
 const MAP_COLOR_HIGH: [number, number, number] = [49, 46, 129] // indigo-900
 export const MAP_UNMATCHED_FILL = '#e2e8f0' // slate-200

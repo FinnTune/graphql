@@ -7,6 +7,7 @@ import {
   clampMapView,
   colorForValue,
   DEFAULT_MAP_VIEW,
+  getScaleRange,
   getValueRange,
   MAX_ZOOM,
   MIN_ZOOM,
@@ -140,5 +141,24 @@ describe('map view', () => {
     const zoomedIn = zoomMapView(DEFAULT_MAP_VIEW, 4, 700, 300)
 
     expect(zoomMapView(zoomedIn, 1)).toEqual(DEFAULT_MAP_VIEW)
+  })
+})
+
+describe('getScaleRange', () => {
+  it('ignores extreme outliers at both ends', () => {
+    const values = [1, ...Array.from({ length: 98 }, (_, i) => 1000 + i), 1_000_000_000]
+
+    const { min, max } = getScaleRange(values)
+
+    expect(min).toBeGreaterThanOrEqual(1000)
+    expect(max).toBeLessThan(1_000_000_000)
+  })
+
+  it('matches the plain range for a handful of values', () => {
+    expect(getScaleRange([5, 10, 20])).toEqual({ min: 5, max: 20 })
+  })
+
+  it('returns zeroes for an empty list', () => {
+    expect(getScaleRange([])).toEqual({ min: 0, max: 0 })
   })
 })

@@ -9,7 +9,7 @@ import {
   clampMapView,
   colorForValue,
   DEFAULT_MAP_VIEW,
-  getValueRange,
+  getScaleRange,
   MAP_UNMATCHED_FILL,
   MAX_ZOOM,
   MIN_ZOOM,
@@ -62,7 +62,7 @@ export default function WorldMap({ countries, selectedCountry, onSelectCountry }
   const features = useMemo(() => projectWorldTopology(worldTopology as unknown as Topology), [])
   const valueIndex = useMemo(() => buildCountryValueIndex(countries, metric), [countries, metric])
   const { min, max } = useMemo(
-    () => getValueRange(Array.from(valueIndex.values()).map((entry) => entry.value)),
+    () => getScaleRange(Array.from(valueIndex.values()).map((entry) => entry.value)),
     [valueIndex],
   )
 
@@ -319,6 +319,7 @@ export default function WorldMap({ countries, selectedCountry, onSelectCountry }
               <div className="mt-1 flex justify-between" data-testid="map-legend">
                 {legendStops.map((stop, index) => (
                   <span key={index}>
+                    {index === 0 ? '≤' : index === legendStops.length - 1 ? '≥' : ''}
                     {formatCompact(stop)}
                     {unit}
                   </span>
