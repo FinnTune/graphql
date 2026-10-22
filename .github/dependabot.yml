@@ -30,6 +30,32 @@ updates:
       types:
         patterns:
           - '@types/*'
+      graphql:
+        patterns:
+          - graphql
+          - graphql-yoga
+          - '@graphql-*'
+      visualization:
+        patterns:
+          - recharts
+          - d3-geo
+          - topojson-client
+      styling:
+        patterns:
+          - tailwindcss
+          - '@tailwindcss/*'
+          - postcss
+      e2e:
+        patterns:
+          - '@playwright/*'
+      # Anything not claimed above: one PR for all minor/patch bumps, so
+      # routine updates don't each open their own pull request.
+      other-minor-and-patch:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
 
   - package-ecosystem: github-actions
     directory: /

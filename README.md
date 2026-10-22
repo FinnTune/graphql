@@ -93,6 +93,11 @@ depends on where the data comes from.
 
 Map geometry: `src/data/world-countries-50m.json` (see its license file).
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow (schema changes, codegen,
+refreshing data, tests, logging).
+
 ## License
 
 GPL-2.0, see [LICENSE](LICENSE).

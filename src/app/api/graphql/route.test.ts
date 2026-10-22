@@ -64,7 +64,7 @@ describe('GraphQL /api/graphql route', () => {
 
   it('returns a masked GraphQL error when the countries source fails', async () => {
     vi.mocked(loadCountries).mockRejectedValue(new Error('source offline'))
-    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const logSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
 
     const response = await postGraphQL(COUNTRIES_QUERY_ALL)
     const json = await response.json()
@@ -74,6 +74,21 @@ describe('GraphQL /api/graphql route', () => {
     // `countries` is non-nullable, so the error nulls the whole `data` payload.
     expect(json.data).toBeNull()
     expect(json.errors?.[0]?.message).toBe('Unexpected error.')
+
+    // Yoga also prints its own (non-JSON) log line; keep only ours.
+    const logged = logSpy.mock.calls.flatMap(([line]) => {
+      try {
+        return [JSON.parse(String(line))]
+      } catch {
+        return []
+      }
+    })
+    expect(logged).toContainEqual(
+      expect.objectContaining({
+        message: 'GraphQL resolver error',
+        error: expect.objectContaining({ message: 'source offline' }),
+      })
+    )
   })
   it('filters, sorts, and limits server-side via arguments', async () => {
     useCountries()

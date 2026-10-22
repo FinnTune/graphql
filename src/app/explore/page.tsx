@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import ExplorerContent from '@/app/explore/ExplorerContent'
+import { logError } from '@/lib/logger'
 import { loadExplorerData } from '@/lib/graphql/execute-explorer'
 import { toExplorerVariables } from '@/lib/graphql-client'
 import { parseExplorerSearchParams } from '@/lib/url-state'
@@ -28,7 +29,7 @@ export default async function Explore({ searchParams }: ExplorePageProps) {
   try {
     initialData = await loadExplorerData(toExplorerVariables({ ...initialState, query: initialState.query.trim() }))
   } catch (error) {
-    console.error('Server-side explorer load failed:', error)
+    logError('Server-side explorer load failed', error, { path: '/explore' })
   }
 
   return <ExplorerContent initialState={initialState} initialData={initialData} />
