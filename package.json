@@ -29,6 +29,7 @@
     "topojson-client": "^3.1.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@graphql-codegen/cli": "^7.4.6",
     "@graphql-codegen/typescript": "^6.1.2",
     "@graphql-codegen/typescript-operations": "^6.1.10",

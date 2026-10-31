@@ -37,7 +37,7 @@ export default function PopulationRankingChart({ countries }: PopulationRankingC
       {/* The table above is the accessible version of this chart. */}
       <div aria-hidden="true">
         <ResponsiveContainer width="100%" height={Math.max(240, data.length * 40)}>
-          <BarChart data={data} layout="vertical" margin={{ top: 8, right: 48, bottom: 8, left: 8 }}>
+          <BarChart accessibilityLayer={false} data={data} layout="vertical" margin={{ top: 8, right: 48, bottom: 8, left: 8 }}>
             <CartesianGrid strokeDasharray="3 3" horizontal={false} />
             <XAxis type="number" tickFormatter={formatNumber} tick={{ fontSize: 12 }} />
             <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 12 }} interval={0} />

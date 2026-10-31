@@ -89,7 +89,7 @@ export default function ComparisonChart({ countryA, countryB }: ComparisonChartP
           </span>
         </div>
         <ResponsiveContainer width="100%" height={260}>
-          <BarChart data={data} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+          <BarChart accessibilityLayer={false} data={data} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="metric" tick={{ fontSize: 12 }} interval={0} />
             <YAxis unit="%" domain={[0, 100]} tick={{ fontSize: 12 }} />
