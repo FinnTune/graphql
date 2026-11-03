@@ -1,5 +1,5 @@
-import { createGraphQLError, createSchema } from 'graphql-yoga'
-import { GraphQLScalarType, Kind } from 'graphql'
+import { createSchema } from 'graphql-yoga'
+import { GraphQLError, GraphQLScalarType, Kind } from 'graphql'
 import {
   buildRegionStats,
   filterAndSortCountries,
@@ -41,7 +41,7 @@ export const schema = createSchema({
     Query: {
       countries: async (_root: unknown, args: CountriesArgs) => {
         if (args.limit != null && (args.limit < 1 || args.limit > MAX_COUNTRIES_LIMIT)) {
-          throw createGraphQLError(`limit must be between 1 and ${MAX_COUNTRIES_LIMIT}`)
+          throw new GraphQLError(`limit must be between 1 and ${MAX_COUNTRIES_LIMIT}`)
         }
 
         const countries = await loadCountries()

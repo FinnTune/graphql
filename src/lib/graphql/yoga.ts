@@ -1,4 +1,5 @@
-import { createGraphQLError, createYoga } from 'graphql-yoga'
+import { GraphQLError } from 'graphql'
+import { createYoga } from 'graphql-yoga'
 import { schema } from '@/lib/graphql/schema'
 import { cachingPlugin } from '@/lib/graphql/caching'
 import { logError } from '@/lib/logger'
@@ -31,7 +32,7 @@ export const yoga = createYoga({
       if (isIntentionalError(error)) return error as Error
       const original = (error as { originalError?: unknown }).originalError ?? error
       logError('GraphQL resolver error', original)
-      return createGraphQLError(message, { extensions: { code: 'INTERNAL_SERVER_ERROR' } })
+      return new GraphQLError(message, { extensions: { code: 'INTERNAL_SERVER_ERROR' } })
     },
   },
   plugins: [securityPlugin({ production: isProduction }), cachingPlugin()],
